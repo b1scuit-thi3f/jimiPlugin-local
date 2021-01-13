@@ -9,7 +9,7 @@ class _localDelete(action._action):
         def generate(self,classObject):
             formData = []
             formData.append({"type" : "break", "start" : True, "schemaitem": "Local Options"})
-            formData.append({"type" : "input", "schemaitem" : "localFile", "textbox" : classObject.localFile, "label" : "local file", "tooltip" : "The local filename to be deleted"})
+            formData.append({"type" : "input", "schemaitem" : "localFile", "textbox" : classObject.localFile, "label" : "local file", "tooltip" : "The local filename (including full path) to be deleted"})
             formData.append({"type" : "break", "start" : False, "schemaitem": "Local Options"})
             formData.append({"type" : "break", "start" : True, "schemaitem": "Core Options"})
             formData.append({"type" : "input", "schemaitem" : "_id", "textbox" : classObject._id})
