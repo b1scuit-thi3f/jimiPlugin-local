@@ -43,6 +43,7 @@ class _localWrite(action._action):
     localFile = str()
     fileData = str()
     append = bool()
+    insert_newlines = bool()
 
     class _properties(webui._properties):
         def generate(self,classObject):
@@ -50,7 +51,8 @@ class _localWrite(action._action):
             formData.append({"type" : "break", "start" : True, "schemaitem": "Local Options"})
             formData.append({"type" : "input", "schemaitem" : "localFile", "textbox" : classObject.localFile, "label" : "local file", "tooltip" : "The local filename (including full path) to be written"})
             formData.append({"type" : "input", "schemaitem" : "fileData", "textbox" : classObject.fileData, "label" : "file data", "tooltip" : "The data to be written to the file"})
-            formData.append({"type" : "checkbox", "schemaitem" : "append", "textbox" : classObject.append, "label" : "append", "tooltip" : "Whether to append or overwrite the file"})
+            formData.append({"type" : "checkbox", "schemaitem" : "append", "checked" : classObject.append, "label" : "append", "tooltip" : "Whether to append or overwrite the file"})
+            formData.append({"type" : "checkbox", "schemaitem" : "insert_newlines", "checked" : classObject.insert_newlines, "label" : "insert newlines", "tooltip" : "Automatically add a newline when appending"})
             formData.append({"type" : "break", "start" : False, "schemaitem": "Local Options"})
             formData.append({"type" : "break", "start" : True, "schemaitem": "Core Options"})
             formData.append({"type" : "input", "schemaitem" : "_id", "textbox" : classObject._id})
@@ -73,6 +75,8 @@ class _localWrite(action._action):
             fileData = fileData.replace("\\n","\n")
             if self.append:
                 with open(localFile,"a") as outputFile:
+                    if self.insert_newlines:
+                        outputFile.write("\n")
                     outputFile.write(fileData)
             else:
                 with open(localFile,"w") as outputFile:
