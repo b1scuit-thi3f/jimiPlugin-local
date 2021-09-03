@@ -1,0 +1,191 @@
+{
+   "name": "local",
+   "author": "b1scuit-thi3f",
+   "version": 1.21,
+   "categories": [],
+   "description": "",
+   "icon": null,
+   "requirements": {
+      "jimi_min_version": null,
+      "jimi_max_version": null,
+      "plugins": []
+   },
+   "collections": {},
+   "triggers": {},
+   "actions": {
+      "localDelete": {
+         "display_name": "localDelete",
+         "className": "_localDelete",
+         "class_location": "models.action",
+         "description": "",
+         "fields": [
+            {
+               "schema_item": "localFile",
+               "schema_value": "localFile",
+               "type": "input",
+               "label": "localFile",
+               "description": ""
+            }
+         ],
+         "data_out": {
+            "result": {
+               "description": "Returns True when successful.",
+               "type": "boolean",
+               "always_present": true,
+               "values": {
+                  "True": {
+                     "description": "Successful."
+                  },
+                  "False": {
+                     "description": "Failure."
+                  }
+               }
+            },
+            "rc": {
+               "description": "Returns the exit code for the action.",
+               "type": "number",
+               "always_present": true,
+               "values": {
+                  "0": {
+                     "description": "Successful."
+                  }
+               }
+            }
+         }
+      },
+      "localWrite": {
+         "display_name": "localWrite",
+         "className": "_localWrite",
+         "class_location": "models.action",
+         "description": "",
+         "fields": [
+            {
+               "schema_item": "localFile",
+               "schema_value": "localFile",
+               "type": "input",
+               "label": "localFile",
+               "description": ""
+            },
+            {
+               "schema_item": "fileData",
+               "schema_value": "fileData",
+               "type": "input",
+               "label": "fileData",
+               "description": ""
+            },
+            {
+               "schema_item": "append",
+               "schema_value": "append",
+               "type": "checkbox",
+               "label": "append",
+               "description": ""
+            },
+            {
+               "schema_item": "insert_newlines",
+               "schema_value": "insert_newlines",
+               "type": "checkbox",
+               "label": "insert_newlines",
+               "description": ""
+            }
+         ],
+         "data_out": {
+            "result": {
+               "description": "Returns True when successful.",
+               "type": "boolean",
+               "always_present": true,
+               "values": {
+                  "True": {
+                     "description": "Successful."
+                  },
+                  "False": {
+                     "description": "Failure."
+                  }
+               }
+            },
+            "rc": {
+               "description": "Returns the exit code for the action.",
+               "type": "number",
+               "always_present": true,
+               "values": {
+                  "0": {
+                     "description": "Successful."
+                  }
+               }
+            }
+         }
+      },
+      "localRead": {
+         "display_name": "localRead",
+         "className": "_localRead",
+         "class_location": "models.action",
+         "description": "",
+         "fields": [
+            {
+               "schema_item": "localFile",
+               "schema_value": "localFile",
+               "type": "input",
+               "label": "localFile",
+               "description": ""
+            },
+            {
+               "schema_item": "outputType",
+               "schema_value": "outputType",
+               "type": "dropdown",
+               "label": "outputType",
+               "description": "",
+               "dropdown": ["raw","json","csv"]
+            },
+            {
+               "schema_item": "customCSVOptions",
+               "schema_value": "customCSVOptions",
+               "type": "group-checkbox",
+               "label": "custom CSV options",
+               "description": "",
+               "group" : 1
+            },
+            {
+               "schema_item": "delimiter",
+               "schema_value": "delimiter",
+               "type": "input",
+               "label": "delimiter",
+               "description": "",
+               "group" : 1
+            },
+            {
+               "schema_item": "quoteCharacter",
+               "schema_value": "quoteCharacter",
+               "type": "input",
+               "label": "quoteCharacter",
+               "description": "",
+               "group" : 1
+            }
+         ],
+         "data_out": {
+            "result": {
+               "description": "Returns True when successful.",
+               "type": "boolean",
+               "always_present": true,
+               "values": {
+                  "True": {
+                     "description": "Successful."
+                  },
+                  "False": {
+                     "description": "Failure."
+                  }
+               }
+            },
+            "rc": {
+               "description": "Returns the exit code for the action.",
+               "type": "number",
+               "always_present": true,
+               "values": {
+                  "0": {
+                     "description": "Successful."
+                  }
+               }
+            }
+         }
+      }
+   },
+   "settings": {}
+}

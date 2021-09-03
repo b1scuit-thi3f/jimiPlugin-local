@@ -1,75 +1,33 @@
 from core.models import action, webui
-from core import helpers, logging
+from core import helpers
 import os
+import json
+import csv
 
 class _localDelete(action._action):
     localFile = str()
-
-    class _properties(webui._properties):
-        def generate(self,classObject):
-            formData = []
-            formData.append({"type" : "break", "start" : True, "schemaitem": "Local Options"})
-            formData.append({"type" : "input", "schemaitem" : "localFile", "textbox" : classObject.localFile, "label" : "local file", "tooltip" : "The local filename (including full path) to be deleted"})
-            formData.append({"type" : "break", "start" : False, "schemaitem": "Local Options"})
-            formData.append({"type" : "break", "start" : True, "schemaitem": "Core Options"})
-            formData.append({"type" : "input", "schemaitem" : "_id", "textbox" : classObject._id})
-            formData.append({"type" : "input", "schemaitem" : "name", "textbox" : classObject.name})
-            formData.append({"type" : "checkbox", "schemaitem" : "enabled", "checked" : classObject.enabled})
-            formData.append({"type" : "json-input", "schemaitem" : "varDefinitions", "textbox" : classObject.varDefinitions})
-            formData.append({"type" : "input", "schemaitem" : "logicString", "textbox" : classObject.logicString})
-            formData.append({"type" : "checkbox", "schemaitem" : "log", "checked" : classObject.log})
-            formData.append({"type" : "input", "schemaitem" : "comment", "textbox" : classObject.comment})
-            return formData
     
-    def run(self,data,persistentData,actionResult):
-        localFile = helpers.evalString(self.localFile,{"data" : data})
+    def doAction(self,data):
+        localFile = helpers.evalString(self.localFile,{"data" : data["flowData"]})
 
-        actionResult["result"] = False
-        actionResult["rc"] = 404
         if os.path.exists(localFile):
             try:
                 os.remove(localFile)
-                actionResult["msg"] = "File removed succesfully"
-                actionResult["result"] = True
-                actionResult["rc"] = 0
+                return {"result":True,"rc":0,"msg":"File removed succesfully"}
             except Exception as errMsg:
-                actionResult["msg"] = errMsg
-                actionResult["rc"] = 500
-        else:
-            actionResult["msg"] = "File does not exist"
-        return actionResult
+                return {"result":False,"rc":500,"msg":errMsg}
+        return {"result":False,"rc":404,"msg":"File not found"}
 
 class _localWrite(action._action):
     localFile = str()
     fileData = str()
     append = bool()
     insert_newlines = bool()
-
-    class _properties(webui._properties):
-        def generate(self,classObject):
-            formData = []
-            formData.append({"type" : "break", "start" : True, "schemaitem": "Local Options"})
-            formData.append({"type" : "input", "schemaitem" : "localFile", "textbox" : classObject.localFile, "label" : "local file", "tooltip" : "The local filename (including full path) to be written"})
-            formData.append({"type" : "input", "schemaitem" : "fileData", "textbox" : classObject.fileData, "label" : "file data", "tooltip" : "The data to be written to the file"})
-            formData.append({"type" : "checkbox", "schemaitem" : "append", "checked" : classObject.append, "label" : "append", "tooltip" : "Whether to append or overwrite the file"})
-            formData.append({"type" : "checkbox", "schemaitem" : "insert_newlines", "checked" : classObject.insert_newlines, "label" : "insert newlines", "tooltip" : "Automatically add a newline when appending"})
-            formData.append({"type" : "break", "start" : False, "schemaitem": "Local Options"})
-            formData.append({"type" : "break", "start" : True, "schemaitem": "Core Options"})
-            formData.append({"type" : "input", "schemaitem" : "_id", "textbox" : classObject._id})
-            formData.append({"type" : "input", "schemaitem" : "name", "textbox" : classObject.name})
-            formData.append({"type" : "checkbox", "schemaitem" : "enabled", "checked" : classObject.enabled})
-            formData.append({"type" : "json-input", "schemaitem" : "varDefinitions", "textbox" : classObject.varDefinitions})
-            formData.append({"type" : "input", "schemaitem" : "logicString", "textbox" : classObject.logicString})
-            formData.append({"type" : "checkbox", "schemaitem" : "log", "checked" : classObject.log})
-            formData.append({"type" : "input", "schemaitem" : "comment", "textbox" : classObject.comment})
-            return formData
     
-    def run(self,data,persistentData,actionResult):
-        localFile = helpers.evalString(self.localFile,{"data" : data})
-        fileData = helpers.evalString(self.fileData,{"data" : data})
+    def doAction(self,data):
+        localFile = helpers.evalString(self.localFile,{"data" : data["flowData"]})
+        fileData = helpers.evalString(self.fileData,{"data" : data["flowData"]})
 
-        actionResult["result"] = False
-        actionResult["rc"] = 404
         try:
             #Fixing new lines
             fileData = fileData.replace("\\n","\n")
@@ -81,10 +39,43 @@ class _localWrite(action._action):
             else:
                 with open(localFile,"w") as outputFile:
                     outputFile.write(fileData)
-            actionResult["msg"] = "File written to successfully"
-            actionResult["result"] = True
-            actionResult["rc"] = 0
+            return {"result":True,"rc":0,"msg":"File written to successfully"}
         except Exception as errMsg:
-            actionResult["msg"] = errMsg
-            actionResult["rc"] = 500
-        return actionResult
+            return {"result":False,"rc":500,"msg":errMsg}
+
+class _localRead(action._action):
+    localFile = str()
+    outputType = "raw"
+    defaultToRaw = True #Just reads file as is if csv/json etc fails
+    customCSVOptions = bool()
+    delimiter = ","
+    quoteCharacter = "\""
+
+    def doAction(self,data):
+        localFile = helpers.evalString(self.localFile,{"data" : data["flowData"]})
+
+        if os.path.exists(localFile):
+            try:
+                if self.outputType == "raw":
+                    with open(localFile,"r") as inputFile:
+                        resultData = inputFile.read()
+
+                elif self.outputType == "json":
+                    with open(localFile,"r") as inputFile:
+                        resultData = json.load(inputFile)
+
+                elif self.outputType == "csv":
+                    resultData = []
+                    with open(localFile,"r") as inputFile:
+                        csvReader = csv.reader(inputFile, delimiter=self.delimiter, quotechar=self.quoteCharacter)
+                        for row in csvReader:
+                            resultData.append(",".join(row))
+                    resultData = "\n".join(resultData)
+
+                return {"result":True,"rc":0,"data":resultData,"msg":"File read successfully"}
+
+            except Exception as errMsg:
+                return {"result":False,"rc":500,"msg":str(errMsg)}
+
+        else:
+            return {"result":False,"rc":404,"msg":"File not found"}
