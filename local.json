@@ -1,7 +1,7 @@
 {
    "name": "local",
    "author": "b1scuit-thi3f",
-   "version": 1.21,
+   "version": 1.22,
    "categories": [],
    "description": "",
    "icon": null,
@@ -134,6 +134,13 @@
                "label": "outputType",
                "description": "",
                "dropdown": ["raw","json","csv"]
+            },
+            {
+               "schema_item": "defaultToRaw",
+               "schema_value": "defaultToRaw",
+               "type": "checkbox",
+               "label": "default to raw",
+               "description": ""
             },
             {
                "schema_item": "customCSVOptions",

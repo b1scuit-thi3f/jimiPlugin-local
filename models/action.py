@@ -75,7 +75,15 @@ class _localRead(action._action):
                 return {"result":True,"rc":0,"data":resultData,"msg":"File read successfully"}
 
             except Exception as errMsg:
-                return {"result":False,"rc":500,"msg":str(errMsg)}
+                if self.outputType != "raw" and self.defaultToRaw:
+                    try:
+                        with open(localFile,"r") as inputFile:
+                            resultData = inputFile.read()
+                            return {"result":True,"rc":0,"data":resultData,"msg":"File read successfully"}
+                    except Exception as errMsg:
+                        return {"result":False,"rc":500,"msg":str(errMsg)}
+                else:
+                    return {"result":False,"rc":500,"msg":str(errMsg)}
 
         else:
             return {"result":False,"rc":404,"msg":"File not found"}
